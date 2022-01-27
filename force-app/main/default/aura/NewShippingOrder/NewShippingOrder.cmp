@@ -1,0 +1,13 @@
+<aura:component implements="force:lightningQuickAction,force:hasRecordId" >
+    <lightning:card title="New Order" >
+        <lightning:recordEditForm objectApiName="Shipping_order__c" onsubmit="{!c.handleClick}">
+            <lightning:inputField fieldName="Status__c" value="Preparing" />
+			<lightning:inputField fieldName="Types_of_goods__c" />
+            <lightning:inputField fieldName="Shipping_project__c" value="{!v.recordId}"/>
+            <lightning:inputField fieldName="Planed_TEU__c" />
+           
+            <br/>
+            <lightning:button name="save" type="submit" label="Save"/>
+        </lightning:recordEditForm>
+    </lightning:card>
+</aura:component>
