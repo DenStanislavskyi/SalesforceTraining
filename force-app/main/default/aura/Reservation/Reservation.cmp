@@ -1,0 +1,14 @@
+<aura:component implements="force:lightningQuickAction,force:hasRecordId" >
+    <lightning:card title="New Reservation" >
+        <lightning:recordEditForm objectApiName="Schedule_Reservation__c" onsuccess="{!c.handleClick}">
+            <lightning:inputField fieldName="Name"/>
+            <lightning:inputField fieldName="Opportunity__c"/>
+            <lightning:inputField fieldName="Status__c" value="Locked" />
+			<lightning:inputField fieldName="Product__c" />
+            <lightning:inputField fieldName="Schedule__c"/>
+            <lightning:inputField fieldName="TEU__c" />
+            <br/>
+            <lightning:button name="save" type="submit" label="Save"/>
+        </lightning:recordEditForm>
+    </lightning:card>
+</aura:component>
