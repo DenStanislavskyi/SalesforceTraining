@@ -1,7 +1,44 @@
-<aura:component implements="force:lightningQuickAction,force:hasRecordId" >
-    <lightning:card title="New Reservation" >
-        <lightning:recordEditForm objectApiName="Schedule_Reservation__c" onsuccess="{!c.handleClick}">
+<aura:component implements="force:lightningQuickAction,force:hasRecordId" controller="FindRoutes">
+<aura:attribute name="recordId" type="String"/>
+<aura:attribute name="Schedule" type="Schedule__c"/>
+<aura:attribute name="Columns" type="List" />
+<aura:attribute name="maxRowSelection" type="Integer" default="1"/>
+<aura:attribute name="routStartDate" type="String" />
+<aura:attribute name="routEndDate" type="String" />
+<aura:attribute name="arrivalPort" type="String" />
+<aura:attribute name="departurePort" type="String" />    
+
+
+
+<lightning:card title="Schedule selection" >
+        
+        
+            <lightning:recordEditForm objectApiName="Route__c">
+                <ui:inputDate aura:id="routStartDate" label="Departure Date"  displayDatePicker="true" format="MM/dd/yyyy"/>
+                <ui:inputDate aura:id="routEndDate" label="Arrival Date"  displayDatePicker="true" format="MM/dd/yyyy"/>
+                <lightning:inputField fieldName="Departure_Location__c" value="{!v.departurePort}" onchange="{!c.getSchedule}"/>
+                <lightning:inputField fieldName="Arrival_Location__c" value="{!v.arrivalPort}" onchange="{!c.getSchedule}"/>
+            </lightning:recordEditForm>
+            <lightning:datatable data="{! v.Schedule }" columns="{! v.Columns }" keyField="Id"  maxRowSelection="{! v.maxRowSelection }"/>
+            <lightning:button label="Search Schedules" title="Search action" onclick="{!c.search}"/>
+            
+    </lightning:card>
+
+    <lightning:card title="Opportunity creation" >
+    <lightning:recordEditForm objectApiName="Opportunity" onsuccess="{! c.createRecord}">
+    <!-- attributes to capture opp fields -->
+    <lightning:inputField fieldName="Name" value="New Opp"/>
+    <lightning:inputField fieldName="StageName" value="Prospecting" />
+    <lightning:inputField fieldName="CloseDate" />
+ 
+  <lightning:button label="Create Opp" type="submit" />
+</lightning:recordEditForm>
+</lightning:card>
+
+<lightning:card title="New Reservation" >
+            <lightning:recordEditForm objectApiName="Schedule_Reservation__c" onsuccess="{!c.handleClick}">
             <lightning:inputField fieldName="Name"/>
+            
             <lightning:inputField fieldName="Opportunity__c"/>
             <lightning:inputField fieldName="Status__c" value="Locked" />
 			<lightning:inputField fieldName="Product__c" />
@@ -11,4 +48,11 @@
             <lightning:button name="save" type="submit" label="Save"/>
         </lightning:recordEditForm>
     </lightning:card>
+
+
+
+
+
+    
+
 </aura:component>
