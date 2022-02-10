@@ -43,7 +43,7 @@
             });
             console.log(' LOG' + $A.enqueueAction(getListOfPossibleSchedules));
 
-            console.log(' LOG  ' + component.get("v.selectedSchedule", selectedRows[0].Id)); 
+            console.log(' LOG  ' + component.get("v.selectedSchedule", selectedRows[0].id)); 
             
             
                 var spinner = cmp.find("mySpinner");
@@ -57,7 +57,7 @@
         
             var selectedRows = event.getParam('selectedRows');
             component.set("v.isScheduleSelected", "true");
-            component.set("v.selectedSchedule", selectedRows[0].Id);
+            component.set("v.selectedSchedule", selectedRows[0].id);
             
     
         },

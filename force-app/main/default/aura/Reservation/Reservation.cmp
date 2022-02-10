@@ -43,10 +43,11 @@
 <aura:if isTrue="{!v.isScheduleSelected}">
     <lightning:card title="New Reservation" >
         <lightning:recordEditForm objectApiName="Schedule_Reservation__c" onsuccess="{!c.handleClick}">
-        <lightning:inputField fieldName="Name"/>
+        
         <lightning:inputField fieldName="Product__c" />
         <lightning:inputField fieldName="TEU__c" />
         <lightning:button name="save" type="submit" label="Save"/>
+        <lightning:inputField fieldName="Name" class="slds-hidden"/>
         <lightning:inputField fieldName="Opportunity__c" value="{!v.recordId}" class="slds-hidden"/>
         <lightning:inputField fieldName="Schedule__c" value="{!v.selectedSchedule}" class="slds-hidden" />
         <lightning:inputField fieldName="Status__c" value="Locked" class="slds-hidden"/> 
