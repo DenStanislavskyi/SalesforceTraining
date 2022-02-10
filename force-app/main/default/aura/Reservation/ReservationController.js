@@ -1,44 +1,91 @@
 ({
-    createRecord : function(component, event, helper) {
-        $A.get("e.force:refreshView").fire();
 
-    },
-	handleClick : function (cmp, event, helper) {
+	handleClick : function (component, event, helper) {
+        $A.get("e.force:refreshView").fire();
         $A.get("e.force:closeQuickAction").fire();
-        $A.get("e.force:refreshView").fire();
-    },
+        
+    },	
 
-    search : function(component, event, helper) {
-        component.set("v.Columns", [
-            {label:"Name", fieldName:"Name", type:"text"},
-            {label:"Departure Date", fieldName:"Departure_Date__c", type:"text"},
-            {label:"Arrival Date", fieldName:"Arrival_Date__c", type:"text"},
-            {label:"Route", fieldName:"Route__c", type:"text"},
-            {label:"Vessel", fieldName:"Vessel__c", type:"text"}
-        ]);
-        console.log(component.get("v.Columns"));
 
-    },
 
     getSchedule : function(component, event, helper){
-        
-        
-        var action = component.get("c.getSchedules");
 
-        action.setParams({
-            startDate: String(component.get("v.routStartDate")),
-            endDate: String(component.get("v.routEndDate")),
-            departure: String(component.get("v.departurePort")),
-            arrival: String(component.get("v.arrivalPort"))
-        });
+        
+            var getListOfPossibleSchedules = component.get("c.getSchedules");
 
-       
-        action.setCallback(this, function(data) {
+
+        
+            component.set("v.Columns",[
+                {label:"Name", fieldName:"scheduleName", type:"text"},
+                {label:"Departure Date", fieldName:"scheduleStartDate", type:"text"},
+                {label:"Arrival Date", fieldName:"scheduleEndDate", type:"text"},
+                {label:"Route", fieldName:"routeName", type:"text"},
+                {label:"Vessel", fieldName:"vesselName", type:"text"}
+            ]);
+    
+        
+            getListOfPossibleSchedules.setParams({
+                startDate: component.get("v.scheduleStartDate"),
+                endDate: component.get("v.scheduleEndDate"),
+                departure: String(component.get("v.departurePort")),
+                arrival: String(component.get("v.arrivalPort"))
+            });
+    
+        
+            getListOfPossibleSchedules.setCallback(this, function(data) {
+                component.set("v.Schedule", data.getReturnValue());
+                component.set("v.isTableReady", "True");
+                component.set("v.isNotEmpty", "True");
+                //if(get returned){
+                   // show toast()
+               // }
+                
+            });
+            console.log(' LOG' + $A.enqueueAction(getListOfPossibleSchedules));
+
+            console.log(' LOG  ' + component.get("v.selectedSchedule", selectedRows[0].Id)); 
             
             
-            component.set("v.Schedule", data.getReturnValue());
-        });
-        $A.enqueueAction(action);
+                var spinner = cmp.find("mySpinner");
+                $A.util.toggleClass(spinner, "slds-hide");
+            
+           
+        },
+    
+ 
+    onSelectedSchedule : function (component, event, helper){
+        
+            var selectedRows = event.getParam('selectedRows');
+            component.set("v.isScheduleSelected", "true");
+            component.set("v.selectedSchedule", selectedRows[0].Id);
+            
+    
+        },
+        showToast : function(component, event, helper) {
+            var toastEvent = $A.get("e.force:showToast");
+            if (v.scheduleStartDate != ""){
+            toastEvent.setParams({
+                "title": "Failure!",
+                "message": "There are no Routes for now or the entered dates are wrong dates."
+            });
+            toastEvent.fire();
+        }
+        },
+
+        // function automatic called by aura:waiting event  
+    showSpinner: function(component, event, helper) {
+        // remove slds-hide class from mySpinner
+        var spinner = component.find("mySpinner");
+        $A.util.removeClass(spinner, "slds-hide");
+    },
+     
+    // function automatic called by aura:doneWaiting event 
+    hideSpinner : function(component,event,helper){
+        // add slds-hide class from mySpinner    
+        var spinner = component.find("mySpinner");
+        $A.util.addClass(spinner, "slds-hide");
     }
 
 })
+
+

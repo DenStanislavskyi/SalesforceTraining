@@ -3,10 +3,14 @@
 <aura:attribute name="Schedule" type="Schedule__c"/>
 <aura:attribute name="Columns" type="List" />
 <aura:attribute name="maxRowSelection" type="Integer" default="1"/>
-<aura:attribute name="routStartDate" type="String" />
-<aura:attribute name="routEndDate" type="String" />
+<aura:attribute name="scheduleStartDate" type="Date" />
+<aura:attribute name="scheduleEndDate" type="Date" />
 <aura:attribute name="arrivalPort" type="String" />
-<aura:attribute name="departurePort" type="String" />    
+<aura:attribute name="departurePort" type="String" />
+<aura:attribute name="selectedSchedule" type="String"/>
+<aura:attribute name="isTableReady" type="Boolean" default="false"/>
+<aura:attribute name="isScheduleSelected" type="Boolean" default="false"/>    
+<aura:attribute name="isNotEmpty" type="Boolean" default="false"/> 
 
 
 
@@ -14,41 +18,43 @@
         
         
             <lightning:recordEditForm objectApiName="Route__c">
-                <ui:inputDate aura:id="routStartDate" label="Departure Date"  displayDatePicker="true" format="MM/dd/yyyy"/>
-                <ui:inputDate aura:id="routEndDate" label="Arrival Date"  displayDatePicker="true" format="MM/dd/yyyy"/>
-                <lightning:inputField fieldName="Departure_Location__c" value="{!v.departurePort}" onchange="{!c.getSchedule}"/>
-                <lightning:inputField fieldName="Arrival_Location__c" value="{!v.arrivalPort}" onchange="{!c.getSchedule}"/>
+                <lightning:input type="date"  label="Departure Date"    value="{!v.scheduleStartDate}" />
+                <lightning:input type="date"  label="Arrival Date"  value="{!v.scheduleEndDate}"/>
+                <lightning:inputField fieldName="Departure_Location__c" value="{!v.departurePort}" />
+                <lightning:inputField fieldName="Arrival_Location__c" value="{!v.arrivalPort}" />
+                <lightning:spinner variant="brand" size="large" aura:id="mySpinner"/>
             </lightning:recordEditForm>
-            <lightning:datatable data="{! v.Schedule }" columns="{! v.Columns }" keyField="Id"  maxRowSelection="{! v.maxRowSelection }"/>
-            <lightning:button label="Search Schedules" title="Search action" onclick="{!c.search}"/>
             
-    </lightning:card>
-
-    <lightning:card title="Opportunity creation" >
-    <lightning:recordEditForm objectApiName="Opportunity" onsuccess="{! c.createRecord}">
-    <!-- attributes to capture opp fields -->
-    <lightning:inputField fieldName="Name" value="New Opp"/>
-    <lightning:inputField fieldName="StageName" value="Prospecting" />
-    <lightning:inputField fieldName="CloseDate" />
- 
-  <lightning:button label="Create Opp" type="submit" />
-</lightning:recordEditForm>
+               <lightning:button label="Search Schedules" title="Search action" onclick="{!c.getSchedule}"/>
+            
 </lightning:card>
+<!--aura handler with waiting and donewaiting events-->
+<aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+<aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
 
-<lightning:card title="New Reservation" >
-            <lightning:recordEditForm objectApiName="Schedule_Reservation__c" onsuccess="{!c.handleClick}">
-            <lightning:inputField fieldName="Name"/>
-            
-            <lightning:inputField fieldName="Opportunity__c"/>
-            <lightning:inputField fieldName="Status__c" value="Locked" />
-			<lightning:inputField fieldName="Product__c" />
-            <lightning:inputField fieldName="Schedule__c"/>
-            <lightning:inputField fieldName="TEU__c" />
-            <br/>
-            <lightning:button name="save" type="submit" label="Save"/>
-        </lightning:recordEditForm>
+
+    <aura:method name="showToast" action="{!c.showToast}" description="Sample method with parameters">
+ </aura:method>
+
+<aura:if isTrue="{!v.isTableReady}">
+    <lightning:datatable data="{!v.Schedule}" onrowselection="{!c.onSelectedSchedule}" columns="{!v.Columns }" keyField="Id"  maxRowSelection="{!v.maxRowSelection}"/>
+
+ 
+<aura:if isTrue="{!v.isScheduleSelected}">
+    <lightning:card title="New Reservation" >
+        <lightning:recordEditForm objectApiName="Schedule_Reservation__c" onsuccess="{!c.handleClick}">
+        <lightning:inputField fieldName="Name"/>
+        <lightning:inputField fieldName="Product__c" />
+        <lightning:inputField fieldName="TEU__c" />
+        <lightning:button name="save" type="submit" label="Save"/>
+        <lightning:inputField fieldName="Opportunity__c" value="{!v.recordId}" class="slds-hidden"/>
+        <lightning:inputField fieldName="Schedule__c" value="{!v.selectedSchedule}" class="slds-hidden" />
+        <lightning:inputField fieldName="Status__c" value="Locked" class="slds-hidden"/> 
+        
+    </lightning:recordEditForm>
     </lightning:card>
-
+</aura:if>
+</aura:if>
 
 
 
