@@ -1,4 +1,4 @@
-trigger CreateContractForOppTrigger on Opportunity (after insert, after update) {
+trigger OpportunityTrigger on Opportunity (after insert, after update) {
     if (Trigger.isAfter) {
         if (Trigger.isUpdate || Trigger.isInsert) {
 
