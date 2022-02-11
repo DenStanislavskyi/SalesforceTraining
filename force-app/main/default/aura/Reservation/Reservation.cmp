@@ -11,6 +11,7 @@
 <aura:attribute name="isTableReady" type="Boolean" default="false"/>
 <aura:attribute name="isScheduleSelected" type="Boolean" default="false"/>    
 <aura:attribute name="isNotEmpty" type="Boolean" default="false"/> 
+<aura:attribute name="isScheduleFound" type="Boolean" default="false"/>
 
 
 
@@ -35,10 +36,12 @@
 
     <aura:method name="showToast" action="{!c.showToast}" description="Sample method with parameters">
  </aura:method>
-
+ 
+ 
 <aura:if isTrue="{!v.isTableReady}">
+    <aura:if isTrue="{!v.isScheduleFound}">
     <lightning:datatable data="{!v.Schedule}" onrowselection="{!c.onSelectedSchedule}" columns="{!v.Columns }" keyField="Id"  maxRowSelection="{!v.maxRowSelection}"/>
-
+    
  
 <aura:if isTrue="{!v.isScheduleSelected}">
     <lightning:card title="New Reservation" >
@@ -54,6 +57,8 @@
         
     </lightning:recordEditForm>
     </lightning:card>
+    </aura:if>
+    
 </aura:if>
 </aura:if>
 

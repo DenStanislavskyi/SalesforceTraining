@@ -13,15 +13,17 @@ public with sharing class OpportunityTriggerTest { //private
         opportunity.CloseDate = Date.today()+7;
         opportunity.OwnerId = UserInfo.getUserId();
         opportunity.AccountId = acc.Id; 
-        insert opportunity;
+        
         
         //When
         Test.startTest();
+        insert opportunity;
         List<Task> tasks = [SELECT Id, Subject,WhatId,OwnerId, Status, ActivityDate FROM Task];
         Test.stopTest();
         
         //Then
         System.assertEquals(1, tasks.size());
+        //insert opp new task Subject call klient due date for next day 
         for (Task task : tasks) {
             System.assertEquals('Create contract for ' + opportunity.Name, task.Subject);
             System.assertEquals(opportunity.Id, task.WhatId);

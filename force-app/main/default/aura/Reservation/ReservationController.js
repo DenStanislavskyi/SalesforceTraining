@@ -12,6 +12,8 @@
 
         
             var getListOfPossibleSchedules = component.get("c.getSchedules");
+            var toastEvent = $A.get("e.force:showToast");
+            var returnedSchedules;
 
 
         
@@ -36,14 +38,27 @@
                 component.set("v.Schedule", data.getReturnValue());
                 component.set("v.isTableReady", "True");
                 component.set("v.isNotEmpty", "True");
-                //if(get returned){
-                   // show toast()
-               // }
+                returnedSchedules = data.getReturnValue();
+               if (returnedSchedules.length > 0) {
+                component.set("v.isScheduleFound", true);
+                console.log("Schedule found");
+            } else {
+                console.log("Schedule NOT FOUND")
+                component.set("v.isScheduleFound", false);
+                
+                
+                toastEvent.setParams({
+                    "title": "Routes not found",
+                    "message": "There are no such Routes awailable for now or the entered dates are wrong."
+                });
+                toastEvent.fire();
+            
+
+            }
                 
             });
             console.log(' LOG' + $A.enqueueAction(getListOfPossibleSchedules));
-
-            console.log(' LOG  ' + component.get("v.selectedSchedule", selectedRows[0].id)); 
+ 
             
             
                 var spinner = cmp.find("mySpinner");
@@ -61,16 +76,7 @@
             
     
         },
-        showToast : function(component, event, helper) {
-            var toastEvent = $A.get("e.force:showToast");
-            if (v.scheduleStartDate != ""){
-            toastEvent.setParams({
-                "title": "Failure!",
-                "message": "There are no Routes for now or the entered dates are wrong dates."
-            });
-            toastEvent.fire();
-        }
-        },
+        
 
         // function automatic called by aura:waiting event  
     showSpinner: function(component, event, helper) {
