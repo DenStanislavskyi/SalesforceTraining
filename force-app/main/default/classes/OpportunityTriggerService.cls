@@ -5,9 +5,9 @@ public with sharing class OpportunityTriggerService {
 
         for (Opportunity opportunity : oppList) {
             if (opportunity.StageName == 'Closed Won') {
-                taskList.add(new task(Subject='Create contract for ' + opportunity.Name, 
+                taskList.add(new task(Subject='Create contract for the opportunity ' + opportunity.Name, 
                     WhatId=opportunity.Id, OwnerId = opportunity.OwnerId, 
-                    ActivityDate= date.today()+7));
+                    ActivityDate= date.today()+7));//,Task_Type__c = 'Contract creation reminder'
             }
         }
         return taskList;

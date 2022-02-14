@@ -1,11 +1,22 @@
 public with sharing class ContractTriggerService {          
     public List<Task> closeTask(List<Task> taskList) {
+        TaskWorkflowConfiguration__mdt taskWorkflowConfiguration = [
+            SELECT Id,
+            Is_Active__c,
+            Task_Subject__c,
+            Task_Type__c
+            FROM TaskWorkflowConfiguration__mdt
+            WHERE developerName = 'ContractReminder'
+        ];
+        
+        if (taskWorkflowConfiguration.Is_Active__c == true){
+
         for (Task task : taskList) {
-            
                 task.Id = task.Id;
                 task.Status = 'Completed';
                 task.Closed_Date__c = Date.today();
-            
+                task.Task_Type__c = taskWorkflowConfiguration.Task_Type__c;
+            }
         }
         return taskList;
     }

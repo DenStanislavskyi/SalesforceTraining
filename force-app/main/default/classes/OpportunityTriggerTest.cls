@@ -23,7 +23,7 @@ public with sharing class OpportunityTriggerTest { //private
         
         //Then
         System.assertEquals(1, tasks.size());
-        //insert opp new task Subject call klient due date for next day 
+        //insert opp new task Subject call client due date for next day 
         for (Task task : tasks) {
             System.assertEquals('Create contract for ' + opportunity.Name, task.Subject);
             System.assertEquals(opportunity.Id, task.WhatId);

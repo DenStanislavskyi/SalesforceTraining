@@ -12,6 +12,8 @@
 <aura:attribute name="isScheduleSelected" type="Boolean" default="false"/>    
 <aura:attribute name="isNotEmpty" type="Boolean" default="false"/> 
 <aura:attribute name="isScheduleFound" type="Boolean" default="false"/>
+<aura:handler name="init" value="{!this}" action="{!c.init}"/>
+<aura:attribute name="spinner" type="Boolean" default="false"/>
 
 
 
@@ -23,19 +25,19 @@
                 <lightning:input type="date"  label="Arrival Date"  value="{!v.scheduleEndDate}"/>
                 <lightning:inputField fieldName="Departure_Location__c" value="{!v.departurePort}" />
                 <lightning:inputField fieldName="Arrival_Location__c" value="{!v.arrivalPort}" />
-                <lightning:spinner variant="brand" size="large" aura:id="mySpinner"/>
+                <aura:if isTrue="{!v.spinner}">
+                    <lightning:spinner variant="brand" size="large"/>
+                </aura:if>
             </lightning:recordEditForm>
-            
+          
                <lightning:button label="Search Schedules" title="Search action" onclick="{!c.getSchedule}"/>
             
 </lightning:card>
-<!--aura handler with waiting and donewaiting events-->
-<aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
-<aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
 
 
-    <aura:method name="showToast" action="{!c.showToast}" description="Sample method with parameters">
- </aura:method>
+
+    
+
  
  
 <aura:if isTrue="{!v.isTableReady}">
