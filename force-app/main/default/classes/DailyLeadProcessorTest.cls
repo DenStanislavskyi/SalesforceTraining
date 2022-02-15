@@ -1,6 +1,6 @@
 @isTest
 public with sharing class DailyLeadProcessorTest {
-    public static String CRON_EXP = '0 0 0 2 6 ? 2022';
+    public static String CRON_EXP = '0 8 0 2 6 ? 2022';
    
     @isTest static void testScheduledJob(){
         List<Lead> leads = new List<Lead>();
