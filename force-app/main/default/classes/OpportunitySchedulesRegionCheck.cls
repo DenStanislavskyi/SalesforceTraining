@@ -15,7 +15,10 @@ public with sharing class OpportunitySchedulesRegionCheck implements Schedulable
         List<Id> listId = new List <Id>();
         for (Region__c regio: defaultRegionId){
             listId.add(regio.Id);
-        }                              
+        }                     
+        Integer oppChanged = 0;
+        Integer shedChanged = 0;
+
 
 
         for (User user : userList) {
@@ -27,12 +30,14 @@ public with sharing class OpportunitySchedulesRegionCheck implements Schedulable
                             if(opp.OwnerId == user.Id && opp.Allow_Region_Check__c == true){
                                 opp.Region_Field__c = user.Region__c;
                                 opp.Region__c = region.Id;
+                                oppChanged++;
                             }
                         }
                         for (Schedule__c schedule : scheduleList) {
                             if(schedule.OwnerId == user.Id && schedule.Allow_Region_Check__c == true){
                                 schedule.Region_Field__c = user.Region__c;
                                 schedule.Region__c = region.Id;
+                                shedChanged++;
                             }
                         }
                     }
@@ -60,6 +65,8 @@ public with sharing class OpportunitySchedulesRegionCheck implements Schedulable
                 }
         }
     }
+    System.debug('Number of Opportunities changed ' + oppChanged + ' out of ' + oppList.size());
+    System.debug('Number of Schedules changed ' + shedChanged + ' out of ' + scheduleList.size());
        
         update oppList;
         update scheduleList;
