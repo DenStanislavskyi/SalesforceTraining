@@ -19,23 +19,21 @@ public with sharing class OpportunitySchedulesRegionCheck implements Schedulable
         Integer oppChanged = 0;
         Integer shedChanged = 0;
 
-
-
         for (User user : userList) {
             if (user.Region__c != '' ){
                 
                 for (Region__c region : regionList) {
                     if (region.Name == user.Region__c){
                         for (Opportunity opp : oppList) {
-                            if(opp.OwnerId == user.Id && opp.Allow_Region_Check__c == true){
-                                opp.Region_Field__c = user.Region__c;
+                            if(opp.OwnerId == user.Id && opp.Allow_Region_Check__c == true && (opp.Region__c == '' || opp.Region__c == null)){
+                                
                                 opp.Region__c = region.Id;
                                 oppChanged++;
                             }
                         }
                         for (Schedule__c schedule : scheduleList) {
-                            if(schedule.OwnerId == user.Id && schedule.Allow_Region_Check__c == true){
-                                schedule.Region_Field__c = user.Region__c;
+                            if(schedule.OwnerId == user.Id && schedule.Allow_Region_Check__c == true && (schedule.Region__c == '' || schedule.Region__c == null)){
+                        
                                 schedule.Region__c = region.Id;
                                 shedChanged++;
                             }
@@ -48,16 +46,15 @@ public with sharing class OpportunitySchedulesRegionCheck implements Schedulable
                         for (Opportunity opp : oppList) {
                             if(opp.Allow_Region_Check__c == true)
                             {
-                                opp.Region_Field__c = 'To Be Defined';
+                                
                                 opp.Region__c = listId[0];
                             }
-                            
                         }
                 
                         for (Schedule__c schedule : scheduleList) {
                             if(schedule.Allow_Region_Check__c == true)
                             {
-                                schedule.Region_Field__c = 'To Be Defined';
+                               
                                 schedule.Region__c = listId[0];
                             }
                         }
