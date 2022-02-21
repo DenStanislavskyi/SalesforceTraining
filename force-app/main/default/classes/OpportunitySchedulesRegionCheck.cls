@@ -8,6 +8,26 @@ public with sharing class OpportunitySchedulesRegionCheck implements Schedulable
         Id batchId2 = Database.executeBatch(schedRegCheck);  
     }
 }
+//OpportunitySchedulesRegionCheck s=new OpportunitySchedulesRegionCheck();s.execute(null);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /*
         List<Opportunity> oppList = [SELECT Id, Name, Region__c, OwnerId, Allow_Region_Check__c 
@@ -78,8 +98,5 @@ public with sharing class OpportunitySchedulesRegionCheck implements Schedulable
         update scheduleList;
         update userList;
 
- 
-//OpportunitySchedulesRegionCheck s=new OpportunitySchedulesRegionCheck();
-//s.execute(null) ;
 //daily cron expr at 8:00 (0 8 * * *)
 */
