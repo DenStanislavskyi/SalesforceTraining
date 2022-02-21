@@ -1,10 +1,19 @@
 public with sharing class OpportunitySchedulesRegionCheck implements Schedulable{
     public void execute(SchedulableContext ctx) {
-        List<Opportunity> oppList = [SELECT Id, Name, Region__c, 
-                                        Opportunity.Region_Field__c, OwnerId, Allow_Region_Check__c 
+
+        OppAndSchBatchRegionCheck oopRegCheck = new OppAndSchBatchRegionCheck();
+        Id batchId = Database.executeBatch(oopRegCheck);  
+
+        SchBatchRegionCheck schedRegCheck = new SchBatchRegionCheck();
+        Id batchId2 = Database.executeBatch(schedRegCheck);  
+    }
+}
+
+/*
+        List<Opportunity> oppList = [SELECT Id, Name, Region__c, OwnerId, Allow_Region_Check__c 
                                     FROM Opportunity  ];
-        List<Schedule__c> scheduleList = [SELECT Id, Name, Schedule__c.Region_Field__c, OwnerId, Allow_Region_Check__c 
-                                          FROM Schedule__c ];
+        List<Schedule__c> scheduleList = [SELECT Id, Name, Region__c, OwnerId, Allow_Region_Check__c 
+            //                              FROM Schedule__c ];
         List<User> userList = [SELECT Id, isActive, Name, Alias, Country,  Region__c  FROM User 
                                 Where Name NOT IN('Automated Process', 'Platform Integration User', 'Data.com Clean')];
         
@@ -69,8 +78,8 @@ public with sharing class OpportunitySchedulesRegionCheck implements Schedulable
         update scheduleList;
         update userList;
 
-    }
-}
+ 
 //OpportunitySchedulesRegionCheck s=new OpportunitySchedulesRegionCheck();
 //s.execute(null) ;
 //daily cron expr at 8:00 (0 8 * * *)
+*/
