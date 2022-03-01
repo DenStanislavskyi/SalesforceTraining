@@ -1,4 +1,4 @@
-<aura:component implements="force:lightningQuickAction,force:hasRecordId" controller="FindRoutes">
+<aura:component implements="force:lightningQuickAction,force:hasRecordId" controller="FindRoutes" >
 <aura:attribute name="recordId" type="String"/>
 <aura:attribute name="Schedule" type="Schedule__c"/>
 <aura:attribute name="Columns" type="List" />
@@ -14,6 +14,10 @@
 <aura:attribute name="isScheduleFound" type="Boolean" default="false"/>
 <aura:handler name="init" value="{!this}" action="{!c.init}"/>
 <aura:attribute name="spinner" type="Boolean" default="false"/>
+    <ltng:require styles="{!$Resource.ContainerWidth80}"/>
+     <div class="slds-modal__container">
+    
+  
 
 
 
@@ -47,7 +51,10 @@
  
 <aura:if isTrue="{!v.isScheduleSelected}">
     <lightning:card title="New Reservation" >
-        <lightning:recordEditForm objectApiName="Schedule_Reservation__c" onsuccess="{!c.handleClick}">
+        <lightning:recordEditForm objectApiName="Schedule_Reservation__c" onsuccess="{!c.handleClick}"  onerror="{!c.handleError}">
+
+            <!-- the messages component is for error messages -->
+            <lightning:messages />
         
         <lightning:inputField fieldName="Product__c" />
         <lightning:inputField fieldName="TEU__c" />
@@ -68,5 +75,5 @@
 
 
     
-
+ </div>
 </aura:component>

@@ -28,10 +28,11 @@ public with sharing class FindRoutes {
     }
 
     public static List<SheduleTableIdToNameChange> getRelatedObjectsNames(List<Schedule__c> scheds) {
-        SheduleTableIdToNameChange route = new SheduleTableIdToNameChange();
+        
         List<SheduleTableIdToNameChange> wrappedSchedules = new List<SheduleTableIdToNameChange>();
 
         for (Schedule__c schedule : scheds) {
+            SheduleTableIdToNameChange route = new SheduleTableIdToNameChange();
             route.id = schedule.Id;
             route.scheduleName = schedule.Name;
             route.scheduleStartDate = schedule.Departure_Date__c;
@@ -42,6 +43,8 @@ public with sharing class FindRoutes {
         }
         return wrappedSchedules;
     }
+
+
 }
     /*public static List<SheduleTableIdToNameChange> getSchedules(Date startDate, 
     Date endDate, String departure, String arrival){
