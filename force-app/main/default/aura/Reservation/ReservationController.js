@@ -1,10 +1,17 @@
 ({
 
 	handleClick : function (component, event, helper) {
+        console.log("heeeeeeeee" + component.get("v.scheduleStartDate"));
+        //if (component.get("v.scheduleStartDate") <)
         $A.get("e.force:refreshView").fire();
         $A.get("e.force:closeQuickAction").fire();
         
-    },	
+    },
+    
+    handleError: function(component, event, helper) {
+        var errors = event.getParams();
+        console.log("response", JSON.stringify(errors));
+    },
 
     init: function (component, event, helper) {
         component.set("v.Columns",[
@@ -57,7 +64,7 @@
                 console.log("departure: " + component.get("v.departurePort"));
                 console.log("arrival: " + component.get("v.arrivalPort"));
                
-                if (returnedSchedules.length > 0 && ( component.get("v.scheduleStartDate")== null  
+               /* if (returnedSchedules.length > 0 && ( component.get("v.scheduleStartDate")== null  
                                                 && component.get("v.scheduleEndDate")== null
                                                 && (component.get("v.arrivalPort")== null || component.get("v.arrivalPort")== undefined || component.get("v.arrivalPort")== '')
                                                 && (component.get("v.departurePort")== null || component.get("v.departurePort")== undefined || component.get("v.departurePort")== ''   ))) {
@@ -73,7 +80,7 @@
             
             
                 }
-                else if (returnedSchedules.length > 0 ) {
+                else*/ if (returnedSchedules.length > 0 ) {
                     component.set("v.isScheduleFound", true);
                     console.log("Schedule found");
                     console.log("Loggg " + component.get("v.scheduleStartDate"));
@@ -114,5 +121,3 @@
         }
 
 })
-
-
