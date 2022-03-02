@@ -1,11 +1,24 @@
 ({
 
 	handleClick : function (component, event, helper) {
-        console.log("heeeeeeeee" + component.get("v.scheduleStartDate"));
-        //if (component.get("v.scheduleStartDate") <)
+        var toastEvent = $A.get("e.force:showToast");
+        toastEvent.setParams({
+        "title": "Success!",
+        "message": "Reservation Created Successfully"
+        });
+ toastEvent.fire();
         $A.get("e.force:refreshView").fire();
         $A.get("e.force:closeQuickAction").fire();
         
+    }, 
+    cancelClick :  function (component, event, helper) {
+    
+        $A.get("e.force:closeQuickAction").fire();
+    },
+    activeButton : function (component, event, helper) {
+    
+        let button = component.find('disablebuttonid');
+        button.set('v.disabled',false);
     },
     
     handleError: function(component, event, helper) {
