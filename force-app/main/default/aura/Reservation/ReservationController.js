@@ -1,10 +1,12 @@
 ({
 
 	handleClick : function (component, event, helper) {
+        component.find('form').submit();
         var toastEvent = $A.get("e.force:showToast");
         toastEvent.setParams({
         "title": "Success!",
-        "message": "Reservation Created Successfully"
+        "message": "Reservation Created Successfully",
+        "type" : "success"
         });
  toastEvent.fire();
         $A.get("e.force:refreshView").fire();

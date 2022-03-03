@@ -17,9 +17,14 @@
 
 
     <ltng:require styles="{!$Resource.ContainerWidth80}"/>
-     
-<lightning:card title="Schedule selection" >
-    <div class="slds-modal__container">
+    <div class="slds-modal__header">
+        <h2 class="slds-modal__title slds-hyphenate">Schedule Reservation</h2>
+    </div>
+
+    <div class="slds-modal__content">
+    
+<lightning:card  title="Schedule selection"  >
+
         
             <lightning:recordEditForm objectApiName="Route__c">
                 <lightning:input type="date"  label="Departure Date"    value="{!v.scheduleStartDate}" />
@@ -32,7 +37,7 @@
             </lightning:recordEditForm>
           
             <lightning:button label="Search Schedules" title="Search action" onclick="{!c.getSchedule}"/>
-        </div>     
+             
 </lightning:card>
 
 
@@ -48,7 +53,7 @@
  
 <aura:if isTrue="{!v.isScheduleSelected}">
     <lightning:card title="New Reservation" >
-        <lightning:recordEditForm objectApiName="Schedule_Reservation__c" onsuccess="{!c.handleClick}"  onerror="{!c.handleError}">
+        <lightning:recordEditForm objectApiName="Schedule_Reservation__c" onsuccess="{!c.handleClick}"  onerror="{!c.handleError}" aura:id="form">
 
             <!-- the messages component is for error messages -->
             <lightning:messages />
@@ -56,24 +61,27 @@
         <lightning:inputField fieldName="Product__c" />
         <lightning:inputField name="TEU" fieldName="TEU__c" onchange = "{!c.activeButton}"/>
 
-        <div class="modal-footer slds-modal__footer">
+        
            
-            <lightning:button name="cancel" type="reset" label="Cancel"  onclick="{! c.cancelClick }" />
-            <lightning:button name="save" type="submit" label="Save" disabled ="true"  aura:id="disablebuttonid"/>
-        </div>
+            <!--<lightning:button name="save" type="submit" label="Save" disabled ="true"  aura:id="disablebuttonid"/>-->
+        
 
-        <lightning:inputField fieldName="Name" class="slds-hidden"/>
+        <!--<lightning:inputField fieldName="Name" class="slds-hidden"/>-->
         <lightning:inputField fieldName="Opportunity__c" value="{!v.recordId}" class="slds-hidden"/>
         <lightning:inputField fieldName="Schedule__c" value="{!v.selectedSchedule}" class="slds-hidden" />
         <lightning:inputField fieldName="Status__c" value="Locked" class="slds-hidden"/> 
-        
+ 
+
     </lightning:recordEditForm>
     </lightning:card>
-    </aura:if>
-    
 </aura:if>
 </aura:if>
+</aura:if> 
 
-
+</div>
+<div class="slds-modal__footer">
+    <button class="slds-button slds-button_neutral" aria-label="Cancel and close" type="reset" onclick="{! c.cancelClick }">Cancel</button>
+    <button class="slds-button slds-button_brand" type="submit" onclick="{!c.handleClick}"  onerror="{!c.handleError}"  disabled ="false"  aura:id="disablebuttonid">Save</button>
+  </div>
 
 </aura:component>
