@@ -22,9 +22,7 @@
     width: 100%;
     max-width: 80vh;
     }
-    .cuf-content {
-    padding: 0rem !important;
-    }
+    
     .slds-p-around--medium {
     padding: 0rem !important;
     }
@@ -90,7 +88,7 @@
 
 
 
-<div class=" modal-footer slds-modal__footer attach-to-bottom slds-p-around--medium slds-p-left_none">
+<div class=" modal-footer slds-modal__footer attach-to-bottom slds-p-around--medium slds-p-left_none cuf-content">
     <button class="slds-button slds-button_neutral" aria-label="Cancel and close" type="reset" onclick="{! c.cancelClick }">Cancel</button>
     <button class="slds-button slds-button_brand" type="submit" onclick="{!c.handleClick}"  onerror="{!c.handleError}"  disabled ="false"  aura:id="disablebuttonid">Save</button>
 </div>
