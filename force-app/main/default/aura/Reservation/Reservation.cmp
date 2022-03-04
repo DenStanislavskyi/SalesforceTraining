@@ -29,7 +29,18 @@
     .slds-table--fixed-layout{
     padding: 12px;
     }
-        
+    
+    .cuf-content {
+        padding: 0 0rem !important;
+        }
+        .slds-p-around--medium {
+        padding: 0rem !important;
+        }
+        .slds-modal__content{
+        overflow-y:hidden !important;
+        height:unset !important;
+        max-height:unset !important;
+        }
 
 </aura:html>
         <!--<ltng:require styles="{!$Resource.ContainerWidth80}"/>-->
@@ -38,7 +49,8 @@
     </div>
 
     
-        
+    <lightning:layout horizontalAlign="space">
+        <lightning:layoutItem padding="around-small" size="10">
 <lightning:card  title="Schedule selection"  >
             <lightning:recordEditForm objectApiName="Route__c">
                 <lightning:input type="date"  label="Departure Date"    value="{!v.scheduleStartDate}" />
@@ -53,6 +65,8 @@
 </lightning:card>
 
 
+</lightning:layoutItem>
+</lightning:layout>
 
 <aura:if isTrue="{!v.isTableReady}">
     <aura:if isTrue="{!v.isScheduleFound}">
@@ -68,7 +82,7 @@
         
         <lightning:inputField fieldName="Product__c" />
         <lightning:inputField name="TEU" fieldName="TEU__c" onchange = "{!c.activeButton}"/>
-
+  
         
            
             <!--<lightning:button name="save" type="submit" label="Save" disabled ="true"  aura:id="disablebuttonid"/>-->
@@ -88,7 +102,7 @@
 
 
 
-<div class=" modal-footer slds-modal__footer attach-to-bottom slds-p-around--medium slds-p-left_none cuf-content">
+<div class=" modal-footer slds-modal__footer attach-to-bottom  cuf-content slds-size_2-of-2">
     <button class="slds-button slds-button_neutral" aria-label="Cancel and close" type="reset" onclick="{! c.cancelClick }">Cancel</button>
     <button class="slds-button slds-button_brand" type="submit" onclick="{!c.handleClick}"  onerror="{!c.handleError}"  disabled ="false"  aura:id="disablebuttonid">Save</button>
 </div>
