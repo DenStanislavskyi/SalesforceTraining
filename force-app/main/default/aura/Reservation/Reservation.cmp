@@ -14,18 +14,34 @@
 <aura:attribute name="isScheduleFound" type="Boolean" default="false"/>
 <aura:handler name="init" value="{!this}" action="{!c.init}"/>
 <aura:attribute name="spinner" type="Boolean" default="false"/>
+<aura:html tag="style">
+    .slds-modal__content {
+    height: auto !important;
+    }
+    .slds-modal__container{
+    width: 100%;
+    max-width: 80vh;
+    }
+    .cuf-content {
+    padding: 0rem !important;
+    }
+    .slds-p-around--medium {
+    padding: 0rem !important;
+    }
+    .slds-table--fixed-layout{
+    padding: 12px;
+    }
+        
 
-
-    <ltng:require styles="{!$Resource.ContainerWidth80}"/>
+</aura:html>
+        <!--<ltng:require styles="{!$Resource.ContainerWidth80}"/>-->
     <div class="slds-modal__header">
         <h2 class="slds-modal__title slds-hyphenate">Schedule Reservation</h2>
     </div>
 
-    <div class="slds-modal__content">
     
-<lightning:card  title="Schedule selection"  >
-
         
+<lightning:card  title="Schedule selection"  >
             <lightning:recordEditForm objectApiName="Route__c">
                 <lightning:input type="date"  label="Departure Date"    value="{!v.scheduleStartDate}" />
                 <lightning:input type="date"  label="Arrival Date"  value="{!v.scheduleEndDate}"/>
@@ -35,17 +51,11 @@
                     <lightning:spinner variant="brand" size="large"/>
                 </aura:if>
             </lightning:recordEditForm>
-          
-            <lightning:button label="Search Schedules" title="Search action" onclick="{!c.getSchedule}"/>
-             
+            <lightning:button label="Search Schedules" title="Search action" onclick="{!c.getSchedule}"/>  
 </lightning:card>
 
 
 
-    
-
- 
- 
 <aura:if isTrue="{!v.isTableReady}">
     <aura:if isTrue="{!v.isScheduleFound}">
     <lightning:datatable data="{!v.Schedule}" onrowselection="{!c.onSelectedSchedule}" columns="{!v.Columns }" keyField="Id"  maxRowSelection="{!v.maxRowSelection}"/>
@@ -78,10 +88,10 @@
 </aura:if>
 </aura:if> 
 
-</div>
-<div class="slds-modal__footer">
+
+
+<div class=" modal-footer slds-modal__footer attach-to-bottom slds-p-around--medium slds-p-left_none">
     <button class="slds-button slds-button_neutral" aria-label="Cancel and close" type="reset" onclick="{! c.cancelClick }">Cancel</button>
     <button class="slds-button slds-button_brand" type="submit" onclick="{!c.handleClick}"  onerror="{!c.handleError}"  disabled ="false"  aura:id="disablebuttonid">Save</button>
-  </div>
-
+</div>
 </aura:component>
