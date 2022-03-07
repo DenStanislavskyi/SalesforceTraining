@@ -19,8 +19,8 @@
     height: auto !important;
     }
     .slds-modal__container{
-    width: 100%;
-    max-width: 80vh;
+        width: 50% !important;
+        max-width: 50% !important;
     }
     
     .slds-p-around--medium {
@@ -67,13 +67,18 @@
 
 </lightning:layoutItem>
 </lightning:layout>
-
+<lightning:layout horizontalAlign="space">
+        <lightning:layoutItem padding="around-small" size="10">
 <aura:if isTrue="{!v.isTableReady}">
     <aura:if isTrue="{!v.isScheduleFound}">
     <lightning:datatable data="{!v.Schedule}" onrowselection="{!c.onSelectedSchedule}" columns="{!v.Columns }" keyField="Id"  maxRowSelection="{!v.maxRowSelection}"/>
-    
- 
+</aura:if>
+</aura:if>
+</lightning:layoutItem>
+</lightning:layout>
 <aura:if isTrue="{!v.isScheduleSelected}">
+    <lightning:layout horizontalAlign="space">
+        <lightning:layoutItem padding="around-small" size="10">
     <lightning:card title="New Reservation" >
         <lightning:recordEditForm objectApiName="Schedule_Reservation__c" onsuccess="{!c.handleClick}"  onerror="{!c.handleError}" aura:id="form">
 
@@ -82,11 +87,7 @@
         
         <lightning:inputField fieldName="Product__c" />
         <lightning:inputField name="TEU" fieldName="TEU__c" onchange = "{!c.activeButton}"/>
-  
-        
-           
-            <!--<lightning:button name="save" type="submit" label="Save" disabled ="true"  aura:id="disablebuttonid"/>-->
-        
+      
 
         <!--<lightning:inputField fieldName="Name" class="slds-hidden"/>-->
         <lightning:inputField fieldName="Opportunity__c" value="{!v.recordId}" class="slds-hidden"/>
@@ -96,14 +97,16 @@
 
     </lightning:recordEditForm>
     </lightning:card>
-</aura:if>
-</aura:if>
+</lightning:layoutItem>
+</lightning:layout>
+
+
 </aura:if> 
 
 
 
-<div class=" modal-footer slds-modal__footer attach-to-bottom  cuf-content slds-size_2-of-2">
-    <button class="slds-button slds-button_neutral" aria-label="Cancel and close" type="reset" onclick="{! c.cancelClick }">Cancel</button>
-    <button class="slds-button slds-button_brand" type="submit" onclick="{!c.handleClick}"  onerror="{!c.handleError}"  disabled ="false"  aura:id="disablebuttonid">Save</button>
+<div class="  slds-modal__footer  ">
+    <lightning:button class="slds-button slds-button_neutral"  onclick="{! c.cancelClick }">Cancel</lightning:button>
+    <lightning:button class="slds-button slds-button_brand"  onclick="{!c.handleClick}"    disabled ="false"  aura:id="disablebuttonid">Save</lightning:button>
 </div>
 </aura:component>
