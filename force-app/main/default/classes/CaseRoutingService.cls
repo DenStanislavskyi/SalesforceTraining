@@ -9,15 +9,13 @@ public with sharing class CaseRoutingService {
         'Portuguese' => Routing_Configuration__mdt.Routing_Portuguese__c
     };
 
-
 private static CaseRoutingService instance;
 private static Map<Id, Group> developerNameMap = new Map<Id, Group>();
 private static Map<Id, Group> queues;
 
-
 private CaseRoutingService() {
 
-    queues = new Map <Id, Group>([SELECT id,DeveloperName from GROUP where Type = 'Queue']);
+    queues = new Map <Id, Group>([SELECT Id, DeveloperName FROM Group WHERE Type = 'Queue']);
 
     for (Id queue : queues.keySet()) {
 
@@ -29,7 +27,6 @@ public static CaseRoutingService getInstance() {
 
     if (CaseRoutingService.instance == null) {
         CaseRoutingService.instance = new CaseRoutingService();
-
     }
     return CaseRoutingService.instance;
 }
@@ -37,7 +34,6 @@ public static CaseRoutingService getInstance() {
 public Id getQueueForCase(Case newCase) {
 
     Routing_Configuration__mdt configuration = CaseRoutingConfiguration.getInstance().getRoutingData(queues.get(newCase.OwnerId).DeveloperName);
-
 
     if (configuration != null) {
         Group routedQueue = developerNameMap.get((String) configuration.get(languageToQueueMap.get(newCase.Preferred_Language__c)));

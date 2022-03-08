@@ -1,3 +1,6 @@
 .THIS .cuf-content {
     padding: 0rem !important;
     }
+.THIS .displayNone{
+    display: none;
+}

@@ -3,19 +3,21 @@ public with sharing class CaseRoutingConfiguration {
   private static CaseRoutingConfiguration instance;
   private Map<String, Routing_Configuration__mdt> configMap;
 
-  private CaseRoutingConfiguration() {
-      configMap = new Map<String, Routing_Configuration__mdt>();
-      this.init();
-  }
-
   public static CaseRoutingConfiguration getInstance() {
       if (instance == null) {
           instance = new CaseRoutingConfiguration();
-
       }
       return instance;
   }
 
+  public Routing_Configuration__mdt getRoutingData(String queueDispatcherApiName) {
+    return configMap.get(queueDispatcherApiName);
+  }
+
+  private CaseRoutingConfiguration() {
+    configMap = new Map<String, Routing_Configuration__mdt>();
+    init();
+  }
 
   private List<Routing_Configuration__mdt> retrieveMetadata() {
       return [
@@ -25,6 +27,7 @@ public with sharing class CaseRoutingConfiguration {
               FROM Routing_Configuration__mdt
       ];
   }
+
   private void fillConfigMap(List<Routing_Configuration__mdt> caseRoutingConfig) {
       for (Routing_Configuration__mdt routing : caseRoutingConfig) {
           configMap.put(routing.Queue__c, routing);
@@ -33,10 +36,6 @@ public with sharing class CaseRoutingConfiguration {
 
   private void init() {
       fillConfigMap(retrieveMetadata());
-  }
-
-  public Routing_Configuration__mdt getRoutingData(String queueDispatcherApiName) {
-      return configMap.get(queueDispatcherApiName);
   }
 }
 

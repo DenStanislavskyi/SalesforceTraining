@@ -90,9 +90,9 @@
       
 
         <!--<lightning:inputField fieldName="Name" class="slds-hidden"/>-->
-        <lightning:inputField fieldName="Opportunity__c" value="{!v.recordId}" class="slds-hidden"/>
-        <lightning:inputField fieldName="Schedule__c" value="{!v.selectedSchedule}" class="slds-hidden" />
-        <lightning:inputField fieldName="Status__c" value="Locked" class="slds-hidden"/> 
+        <lightning:inputField fieldName="Opportunity__c" value="{!v.recordId}" class="displayNone"/> 
+        <lightning:inputField fieldName="Schedule__c" value="{!v.selectedSchedule}" class="displayNone" />
+        <lightning:inputField fieldName="Status__c" value="Locked" class="displayNone"/> 
  
 
     </lightning:recordEditForm>
