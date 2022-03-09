@@ -10,6 +10,10 @@ public with sharing class CaseRoutingConfiguration {
       return instance;
   }
 
+  public List<Routing_Configuration__mdt> getAllRoutingConfig() {
+    return configMap.values();
+  }
+
   public Routing_Configuration__mdt getRoutingData(String queueDispatcherApiName) {
     return configMap.get(queueDispatcherApiName);
   }
@@ -21,7 +25,7 @@ public with sharing class CaseRoutingConfiguration {
 
   private List<Routing_Configuration__mdt> retrieveMetadata() {
       return [
-              SELECT Id, DeveloperName,Queue__c, Routing_Chinese__c, Routing_English__c,
+              SELECT Id, DeveloperName, Queue__c, Routing_Chinese__c, Routing_English__c,
                       Routing_French__c, Routing_German__c, Routing_Italian__c,
                       Routing_Portuguese__c
               FROM Routing_Configuration__mdt

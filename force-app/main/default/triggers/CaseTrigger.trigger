@@ -1,31 +1,19 @@
-trigger CaseTrigger on Case (before insert, before update, after insert, after update) {
-    List<Case> escalated = [
-        SELECT Id, Status, IsEscalated
-        FROM Case
-        WHERE (IsEscalated = true AND Status != 'Escalated')
-    ];
-    List<Case> cases = new List<Case>();
+trigger CaseTrigger on Case (before insert, before update) {
 
-    if (Trigger.isBefore) {
-        if (Trigger.isUpdate) {
-        
-/*             for (Case newCase : Trigger.new) {
-                if (newCase.OwnerId.getSobjectType() != User.getSObjectType()) {
-                    Id queueLanguageId = CaseRoutingService.getInstance().getQueueForCase(newCase);
-                    if (queueLanguageId != null) {
-                        newCase.OwnerId = queueLanguageId;
-                    }
-                }
-            } */
-        }
+    CaseTriggerHandler caseTriggerHandler = new CaseTriggerHandler();
+    
+    if (Trigger.isBefore && Trigger.isUpdate) {
+        caseTriggerHandler.changeQueueOwnerByLanguage(Trigger.new);
+        caseTriggerHandler.changeQueueOwnerByLanguage(Trigger.newMap, Trigger.oldMap);
     }
-    if (Trigger.isAfter) {
-        if (Trigger.isUpdate) {
-            for (Case newCase : escalated) {
-                newCase.Status = 'Escalated';
-                cases.add(newCase);
-            }     
-            update cases;
-        }
-    }
+
+    //if (Trigger.isBefore) { //new and old cases
+       // if (Trigger.isUpdate) {
+           //caseTriggerHandler.escalatedStatusCheck(Trigger.New);
+      //  }
+
+       // if (Trigger.isBefore) {//new and old cases
+            // caseTriggerHandler.onBeforeUpdate(Trigger.New);
+       // }
+   // }
 }
