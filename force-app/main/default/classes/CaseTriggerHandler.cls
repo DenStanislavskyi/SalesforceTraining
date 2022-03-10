@@ -24,4 +24,20 @@ public with sharing class CaseTriggerHandler {
             }
         }
     }
+
+    public void setDateTimeOfLastStatusChange (List<Case> cases){
+        for(Case newCase : cases){
+            newCase.Last_status_change_date__c = Datetime.now();
+        }
+    }
+
+    public void setDateTimeOfLastStatusChange (List<Case> newCases, List<Case> oldCases){
+        for(Case newCase : newCases){
+            for (Case oldCase : oldCases) {
+                if (oldCase.Status != newCase.Status) {
+                    newCase.Last_status_change_date__c = Datetime.now();
+                }
+            }
+        }
+    }
 }
