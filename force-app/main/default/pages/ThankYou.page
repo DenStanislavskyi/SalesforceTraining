@@ -1,0 +1,15 @@
+<apex:page showHeader="false" title="Thank you" cache="false">
+  <apex:composition template="StdExceptionTemplate">
+    <apex:define name="icon">
+      <apex:image url="{!URLFOR($Resource.UCLogo)}"/>
+    </apex:define>
+    <apex:define name="error">
+      <apex:outputText escape="false" styleClass="title" value="Thank you">
+        <apex:param value="{!$Site.BaseUrl}"/>
+      </apex:outputText>
+      <br/>
+      <br/>
+      <apex:outputText value="The form was submitted!"/>
+   </apex:define>
+  </apex:composition>
+</apex:page>

@@ -1,0 +1,82 @@
+<apex:page standardController="Case">
+    <!--  ----------------------------------------------------------------------  -->
+<!--  NOTE: Please add the following <META> element to your page <HEAD>.      -->
+<!--  If necessary, please modify the charset parameter to specify the        -->
+<!--  character set of your HTML page.                                        -->
+<!--  ----------------------------------------------------------------------  -->
+
+<META HTTP-EQUIV="Content-type" CONTENT="text/html; charset=UTF-8"/>
+
+<!--  ----------------------------------------------------------------------  -->
+<!--  NOTE: Please add the following <FORM> element to your page.             -->
+<!--  ----------------------------------------------------------------------  -->
+
+<form action="https://webto.salesforce.com/servlet/servlet.WebToCase?encoding=UTF-8" method="POST">
+
+<input type="hidden" name="orgid" value="00D7Q000000HNSZ"/>
+    <input type="hidden" name="retURL" value="https://universalcontainercomp-developer-edition.eu44.force.com/IssueForm"/>
+
+<!--  ----------------------------------------------------------------------  -->
+<!--  NOTE: These fields are optional debugging elements. Please uncomment    -->
+<!--  these lines if you wish to test in debug mode.                          -->
+<!--  <input type="hidden" name="debug" value=1>                              -->
+<!--  <input type="hidden" name="debugEmail"                                  -->
+<!--  value="dstanislavskyi@gmail.com">                                       -->
+<!--  ----------------------------------------------------------------------  -->
+
+    <label for="name">Contact Name</label><input  id="name" maxlength="80" name="name" size="20" type="text" /><br/>
+
+    <label for="email">Email</label><input  id="email" maxlength="80" name="email" size="20" type="text" /><br/>
+
+    <label for="phone">Phone</label><input  id="phone" maxlength="40" name="phone" size="20" type="text" /><br/>
+
+    <label for="subject">Subject</label><input  id="subject" maxlength="80" name="subject" size="20" type="text" /><br/>
+
+    <label for="description">Description</label><textarea name="description"></textarea><br/>
+
+<label for="recordType">Case Record Type</label><select  id="recordType" name="recordType"><option value="">--None--</option><option value="0127Q000000xbea">Delivery Complaint</option>
+<option value="0127Q000000xbeQ">Delivery Information</option>
+<option value="0127Q000000xb1p">Invoice Correction</option>
+<option value="0127Q000000xb1k">Invoice Request</option>
+<option value="0127Q000000xbef">Missing/Damaged Goods</option>
+<option value="0127Q000000xbeV">Other</option>
+<option value="0127Q000000xbeL">Pickup Request</option>
+<option value="0127Q000000xbek">Wrong Location</option>
+    </select><br/>
+
+Preferred Language:<select  id="00N7Q000004wsW5" name="00N7Q000004wsW5" title="Preferred Language"><option value="">--None--</option><option value="English">English</option>
+<option value="German">German</option>
+<option value="Chinese">Chinese</option>
+<option value="French">French</option>
+<option value="Italian">Italian</option>
+<option value="Portuguese">Portuguese</option>
+    </select><br/>
+
+    <input type="submit" name="submit"/>
+
+</form>
+
+    <apex:form >
+    <apex:pageBlock title="Issue Form">
+        <img src="{!$Resource.UCLogo}" width="5%"/>
+         <apex:pageMessages />
+        <apex:pageBlockSection columns="2" title="Issue Selection">
+           
+            <apex:inputField value="{! Case.Preferred_Language__c }"/>
+    		<apex:inputField value="{! Case.RecordTypeId }"/>
+    		<apex:inputField value="{! Case.Subject }"/>
+    		<apex:inputField value="{! Case.Description }"/>
+        </apex:pageBlockSection>
+        
+        <apex:pageBlockSection columns="2" title="Contact Information">
+            <apex:inputField value="{! Case.SuppliedName }" required="true" />
+            <apex:inputField value="{! Case.SuppliedEmail }" required="true" />
+            <apex:inputField value="{! Case.SuppliedPhone }" required="true" />
+            
+        </apex:pageBlockSection>
+        <apex:pageBlockButtons >
+            <apex:commandButton action="{! save }" value="Save" />
+        </apex:pageBlockButtons>
+    </apex:pageBlock>
+    </apex:form>
+</apex:page>
