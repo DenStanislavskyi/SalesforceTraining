@@ -6,10 +6,10 @@ global with sharing class CaseEndpoint {
 
         String requestBody = RestContext.request.requestBody.toString();
         List<CaseWrapper> casesToUpdate = (List<CaseWrapper>) JSON.deserialize(requestBody, List<CaseWrapper>.class);
+        List<Case> casesToUpdateList = new List<Case>();
 
         for (CaseWrapper receivedCase : casesToUpdate) {
             Case newCase = new Case();
-
             newCase.Preferred_Language__c = receivedCase.Preferred_Language;
             newCase.RecordTypeId = CaseUtils.getRecordTypeIdByDevName(receivedCase.record_type);
             newCase.Priority = receivedCase.Priority;
@@ -20,22 +20,17 @@ global with sharing class CaseEndpoint {
             newCase.SuppliedPhone = receivedCase.SuppliedPhone;
             newCase.SuppliedName = receivedCase.SuppliedName;
             newCase.External_Id__c = receivedCase.external_id;
-            upsert newCase Case.External_Id__c;
+            casesToUpdateList.add(newCase);
         }
+        upsert casesToUpdateList Case.External_Id__c;
     }
 
     @HttpDelete
     global static void deleteCase() {
-        System.debug('Delete Case');
         String requestBody = RestContext.request.requestBody.toString();
-        List<CaseWrapper> casesToDelete = (List<CaseWrapper>) JSON.deserialize(requestBody, List<CaseWrapper>.class);
-        List<String> casesToDeleteIds = new List<String>();
-
-        for (CaseWrapper receivedCase : casesToDelete) {
-            casesToDeleteIds.add(receivedCase.external_id);
-        }
-
-        List<Case> casesToDeleteByExtIds = [SELECT Id FROM Case WHERE External_Id__c IN :casesToDeleteIds];
+        List<String> casesIdsToDelete = (List<String>) JSON.deserialize(requestBody, List<String>.class);
+        
+        List<Case> casesToDeleteByExtIds = [SELECT Id FROM Case WHERE External_Id__c IN :casesIdsToDelete];
         delete casesToDeleteByExtIds;
     }
 }
