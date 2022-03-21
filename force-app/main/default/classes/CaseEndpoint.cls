@@ -1,5 +1,7 @@
-@RestResource(urlMapping='/cases')
+@RestResource(urlMapping='/cases/*')
 global with sharing class CaseEndpoint {
+    private static final String PARAM_EXTERNAL_ID = 'external_id';
+    private static final String EXCEPTION_MESSAGE_BAD_PARAMETERS = 'None or Bad External Id was passed into the parameter.';
 
     @HttpPost
     global static void upsertCases() {
@@ -20,6 +22,7 @@ global with sharing class CaseEndpoint {
             newCase.SuppliedPhone = receivedCase.SuppliedPhone;
             newCase.SuppliedName = receivedCase.SuppliedName;
             newCase.External_Id__c = receivedCase.external_id;
+            newCase.Last_Change_Org_Id__c = receivedCase.last_change;
             casesToUpdateList.add(newCase);
         }
         upsert casesToUpdateList Case.External_Id__c;
@@ -27,10 +30,19 @@ global with sharing class CaseEndpoint {
 
     @HttpDelete
     global static void deleteCase() {
-        String requestBody = RestContext.request.requestBody.toString();
-        List<String> casesIdsToDelete = (List<String>) JSON.deserialize(requestBody, List<String>.class);
-        
-        List<Case> casesToDeleteByExtIds = [SELECT Id FROM Case WHERE External_Id__c IN :casesIdsToDelete];
-        delete casesToDeleteByExtIds;
+        String requestParam = RestContext.request.params.get(PARAM_EXTERNAL_ID);
+        System.debug(requestParam);
+        if (!String.isBlank(requestParam) && !String.isEmpty(requestParam) && requestParam != null) {
+            List<String> parameterValues = requestParam.split(',');
+            List<Case> caseToDeleteByExtId = [SELECT Id FROM Case WHERE External_Id__c In :parameterValues];
+            delete caseToDeleteByExtId;
+        }
+
+        else {
+            String message = EXCEPTION_MESSAGE_BAD_PARAMETERS;
+            RestResponse response = RestContext.response;
+            response.statusCode = 400;
+            response.responseBody = Blob.valueOf(message);
+        }
     }
 }
