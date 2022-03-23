@@ -1,7 +1,7 @@
 // url of my org System.URL.getSalesforceBaseUrl().toExternalForm()
 public with sharing class UCFCaseCalloutService {
     static final String FILIPS_ORG_ENDPOINT = 'callout:Filips_Org/services/apexrest/case';
-    // Private helper meth to create / build valid parameters for each method
+    private static final String PARAM_EXTERNAL_ID = 'external_id';
     static Map<Id, String> IdToExternalRecordTypeMap = new Map<Id, String>{
 
             CaseUtils.getRecordTypeIdByDevName(CaseUtils.RT_INVOICE_REQUEST) => 'Invoice_request',
@@ -34,16 +34,15 @@ public with sharing class UCFCaseCalloutService {
         request.setEndpoint(FILIPS_ORG_ENDPOINT + buildEndpointParameterForDelete(casesReceivedToDelete));
         HttpResponse response = http.send(request);
         System.debug(response);
+        System.debug(response.getBody());
     }
 
     public static String wrapCasesAndBuildJson(List<Case> casesData) {
         List<CaseWrapper> wrappedCasesToSend = new List<CaseWrapper>();
         for (Case processedCase : casesData) {
-            // if (processedCase.Last_Change_Org_Id__c != 'FILIP') {
             CaseWrapper caseWrapper = new CaseWrapper(processedCase);
             caseWrapper.record_type = IdToExternalRecordTypeMap.get(processedCase.RecordType.Id);
             wrappedCasesToSend.add(caseWrapper);
-            //}
         }
         String jsonSerialized = JSON.serialize(wrappedCasesToSend);
         return jsonSerialized;
@@ -54,8 +53,9 @@ public with sharing class UCFCaseCalloutService {
         for (Case processedCase : casesReceivedToDelete) {
             externalIdList.add(processedCase.External_Id__c);
         }
-        String parameterBuilt = new CaseParameterBuilder().addParam('external_id', String.join(externalIdList, ',')).build();
+        String parameterBuilt = new CaseParameterBuilder().addParam(PARAM_EXTERNAL_ID, String.join(externalIdList, ',')).build();
         if (String.isNotBlank(parameterBuilt)) {
+            System.debug(parameterBuilt);
             return parameterBuilt;
         }
         return null;

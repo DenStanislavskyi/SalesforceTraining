@@ -2,6 +2,8 @@
 global with sharing class CaseEndpoint {
     private static final String PARAM_EXTERNAL_ID = 'external_id';
     private static final String EXCEPTION_MESSAGE_BAD_PARAMETERS = 'None or Bad External Id was passed into the parameter.';
+    private static final String EXCEPTION_MESSAGE_WRONG_PARAMETER_PROVIDED = 'Wrong parameter provided.';
+    private static final String EXCEPTION_MESSAGE_CASE_NOT_FOUND = 'Case with given id was not found.';
 
     @HttpPost
     global static void upsertCases() {
@@ -22,7 +24,7 @@ global with sharing class CaseEndpoint {
             newCase.SuppliedPhone = receivedCase.SuppliedPhone;
             newCase.SuppliedName = receivedCase.SuppliedName;
             newCase.External_Id__c = receivedCase.external_id;
-            newCase.Last_Change_Org_Id__c = receivedCase.last_change;
+            newCase.Last_Change_Org_Id__c = receivedCase.last_change_source_org;
             casesToUpdateList.add(newCase);
         }
         upsert casesToUpdateList Case.External_Id__c;
@@ -31,18 +33,25 @@ global with sharing class CaseEndpoint {
     @HttpDelete
     global static void deleteCase() {
         String requestParam = RestContext.request.params.get(PARAM_EXTERNAL_ID);
-        System.debug(requestParam);
-        if (!String.isBlank(requestParam) && !String.isEmpty(requestParam) && requestParam != null) {
-            List<String> parameterValues = requestParam.split(',');
+        List<String> parameterValues = requestParam.split(',');
+        TRY {
             List<Case> caseToDeleteByExtId = [SELECT Id FROM Case WHERE External_Id__c In :parameterValues];
+            if (caseToDeleteByExtId.isEmpty()) {
+                throw new ResourceNotFoundException(EXCEPTION_MESSAGE_CASE_NOT_FOUND);
+            }
+            if (String.isBlank(requestParam)) {
+                throw new WrongParametersProvidedException(EXCEPTION_MESSAGE_WRONG_PARAMETER_PROVIDED);
+            }
             delete caseToDeleteByExtId;
-        }
 
-        else {
-            String message = EXCEPTION_MESSAGE_BAD_PARAMETERS;
-            RestResponse response = RestContext.response;
-            response.statusCode = 400;
-            response.responseBody = Blob.valueOf(message);
+        } CATCH (Exception e) {
+            RestContext.response.responseBody = Blob.valueOf(e.getMessage());
+            RestContext.response.statusCode = 400;
         }
+    }
+
+    private class ResourceNotFoundException extends Exception {
+    }
+    private class WrongParametersProvidedException extends Exception {
     }
 }

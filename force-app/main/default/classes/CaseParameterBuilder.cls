@@ -1,5 +1,4 @@
 public with sharing class CaseParameterBuilder {
-    private String urlParam;
     private List<String> paramsList;
 
     public CaseParameterBuilder() {
