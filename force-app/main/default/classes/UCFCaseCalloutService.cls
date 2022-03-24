@@ -1,4 +1,4 @@
-// url of my org System.URL.getSalesforceBaseUrl().toExternalForm()
+
 public with sharing class UCFCaseCalloutService {
     static final String FILIPS_ORG_ENDPOINT = 'callout:Filips_Org/services/apexrest/case';
     private static final String PARAM_EXTERNAL_ID = 'external_id';
@@ -13,6 +13,32 @@ public with sharing class UCFCaseCalloutService {
             CaseUtils.getRecordTypeIdByDevName(CaseUtils.RT_MISSING_DAMAGED_GOODS) => 'Complaint_Missing_or_damaged_goods',
             CaseUtils.getRecordTypeIdByDevName(CaseUtils.RT_OTHER) => 'Support_Other'
     };
+
+    @Future(callout=true)
+    public static void sendDeleteCallout(Set<String> casesExternalIds) {
+/*        List<Case> casesList = new List<Case>();
+        for (String externalId : casesExternalIds) {
+            casesList.add(new Case(External_Id__c = externalId));
+        }*/
+        List<Case> casesToDelete = [
+                SELECT Id, External_Id__c, Preferred_Language__c, RecordType.DeveloperName, Status, Priority, Origin, Subject, Description, Comments, SuppliedEmail,
+                        SuppliedPhone, SuppliedName, Last_Change_Org_Id__c
+                FROM Case
+                WHERE External_Id__c in :casesExternalids
+        ];
+        sendDeleteCallout(casesToDelete);
+    }
+
+    @Future(callout=true)
+    public static void sendUpsertCallout(Set<String> casesExternalids) {
+        List<Case> casesToSend = [
+                SELECT Id, External_Id__c, Preferred_Language__c, RecordType.DeveloperName, Status, Priority, Origin, Subject, Description, Comments, SuppliedEmail,
+                        SuppliedPhone, SuppliedName, Last_Change_Org_Id__c
+                FROM Case
+                WHERE External_Id__c in :casesExternalids
+        ];
+        sendUpsertCallout(casesToSend);
+    }
 
     public static void sendUpsertCallout(List<Case> casesData) {
         List<CaseWrapper> wrappedCasesToSend = new List<CaseWrapper>();

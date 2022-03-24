@@ -1,30 +1,76 @@
 public with sharing class CaseTriggerHandler implements ITrigger {
-    private static final String MY_SOURCE_ORG_NAME = 'DENYS';
+
+    private Set<String> caseExternalIdsToDelete = new Set<String>();
+    private Set<String> caseExternalIdsToUpdate = new Set<String>();
+
+    CaseTriggerHelper caseHelper = new CaseTriggerHelper();
     public void run() {
         bulkBefore();
         bulkAfter();
 
         if (Trigger.isBefore) {
             if (Trigger.isInsert) {
-                setDateTimeOfLastStatusChange(Trigger.new);
+                for (Case newCase : (List<Case>) Trigger.new) {
+                    beforeInsert(newCase);
+                }
             }
 
             else if (Trigger.isUpdate) {
-                changeQueueOwnerByLanguage(Trigger.new);
-                changeQueueOwnerByLanguage((Map<Id, Case>) Trigger.newMap, (Map<Id, Case>) Trigger.oldMap);
-                setDateTimeOfLastStatusChange(Trigger.new, Trigger.old);
-                updateLastChangeSourceOrgField((Map<Id, Case>) Trigger.newMap, (Map<Id, Case>) Trigger.oldMap);
+                for (Case newCase : (List<Case>) Trigger.new) {
+                    for (Case oldCase : (List<Case>) Trigger.old) {
+                        beforeUpdate(newCase, oldCase);
+                    }
+                }
             }
         } else if (Trigger.isAfter) {
             if (Trigger.isInsert) {
-
+                for (Case newCase : (List<Case>) Trigger.new) {
+                    afterInsert(newCase);
+                }
             }
 
             else if (Trigger.isUpdate) {
-
+                for (Case newCase : (List<Case>) Trigger.new) {
+                    for (Case oldCase : (List<Case>) Trigger.old) {
+                        afterUpdate(newCase, oldCase);
+                    }
+                }
+            } else if (Trigger.isDelete) {
+                for (Case oldCase : (List<Case>) Trigger.old) {
+                    afterDelete(oldCase);
+                }
             }
         }
         andFinally();
+    }
+
+    public void beforeInsert(Case newCase) {
+        caseHelper.setDateTimeOfLastStatusChange(newCase);
+    }
+
+    private void beforeUpdate(Case newCase, Case oldCase) {
+        caseHelper.updateLastChangeSourceOrgField(newCase, oldCase);
+        caseHelper.setDateTimeOfLastStatusChange(newCase, oldCase);
+        caseHelper.changeQueueOwnerByLanguage(newCase);
+        caseHelper.changeQueueOwnerByLanguage(newCase, oldCase);
+    }
+
+    public void afterInsert(Case newCase) {
+        if (newCase.External_Id__c != null) {
+            caseExternalIdsToUpdate.add(newCase.External_Id__c);
+        }
+    }
+
+    public void afterUpdate(Case newCase, Case oldCase) {
+        if (newCase.External_Id__c != null) {
+            caseExternalIdsToUpdate.add(newCase.External_Id__c);
+        }
+    }
+
+    public void afterDelete(Case oldCase) {
+        if (oldCase.External_Id__c != null) {
+            caseExternalIdsToDelete.add(oldCase.External_Id__c);
+        }
     }
 
     public void bulkBefore() {
@@ -46,74 +92,15 @@ public with sharing class CaseTriggerHandler implements ITrigger {
 
         }
     }
+
     public void andFinally() {
-        
-    }
-
-    public void changeQueueOwnerByLanguage(List<Case> cases) {
-        for (Case newCase : cases) {
-            if (newCase.OwnerId.getSobjectType() != User.getSObjectType()) {
-                Id queueLanguageId = CaseRoutingService.getInstance().getQueueForCase(newCase);
-                if (queueLanguageId != null) {
-                    newCase.OwnerId = queueLanguageId;
-                    if (newCase.External_Id__c == null) {
-                        newCase.External_Id__c = GuidGenerator.generate();
-                    }
-                    if (String.isBlank(newCase.Last_Change_Org_Id__c)) {
-                        newCase.Last_Change_Org_Id__c = MY_SOURCE_ORG_NAME;
-                    }
-                }
+        if (Trigger.isDelete) {
+            if (!caseExternalIdsToDelete.isEmpty()) {
+                UCFCaseCalloutService.sendDeleteCallout(caseExternalIdsToDelete);
             }
-        }
-    }
-
-    public void changeQueueOwnerByLanguage(Map<Id, Case> newCases, Map<Id, Case> oldCases) {
-
-        for (Case newCase : newCases.values()) {
-            if (newCase.OwnerId.getSobjectType() != User.getSObjectType()) {
-                if (newCase.Preferred_Language__c != oldCases.get(newCase.Id).Preferred_Language__c) {
-
-                    String queueDispatcherName = CaseRoutingService.getInstance().getQueueDispatcherName(oldCases.get(newCase.Id).OwnerId, LanguageEnum.valueOf(oldCases.get(newCase.Id).Preferred_Language__c));
-                    Id queue = CaseRoutingService.getInstance().getQueueForDispatcher(queueDispatcherName, LanguageEnum.valueOf(newCase.Preferred_Language__c));
-                    newCase.OwnerId = queue;
-                }
-            }
-        }
-    }
-
-    public void setDateTimeOfLastStatusChange(List<Case> cases) {
-        for (Case newCase : cases) {
-            newCase.Last_status_change_date__c = Datetime.now();
-        }
-    }
-
-    public void setDateTimeOfLastStatusChange(List<Case> newCases, List<Case> oldCases) {
-        for (Case newCase : newCases) {
-            for (Case oldCase : oldCases) {
-                if (oldCase.Status != newCase.Status) {
-                    newCase.Last_status_change_date__c = Datetime.now();
-                }
-            }
-        }
-    }
-
-    public void updateLastChangeSourceOrgField(Map<Id, Case> newCases, Map<Id, Case> oldCases) {
-        for (Case newCase : newCases.values()) {
-            System.debug(newCase.Last_Change_Org_Id__c);
-            if (newCase.Preferred_Language__c != oldCases.get(newCase.Id).Preferred_Language__c ||
-                    newCase.RecordType.DeveloperName != oldCases.get(newCase.Id).RecordType.DeveloperName ||
-                    newCase.Priority != oldCases.get(newCase.Id).Priority ||
-                    newCase.Origin != oldCases.get(newCase.Id).Origin ||
-                    newCase.Subject != oldCases.get(newCase.Id).Subject ||
-                    newCase.Description != oldCases.get(newCase.Id).Description ||
-                    newCase.Comments != oldCases.get(newCase.Id).Comments ||
-                    newCase.SuppliedEmail != oldCases.get(newCase.Id).SuppliedEmail ||
-                    newCase.SuppliedPhone != oldCases.get(newCase.Id).SuppliedPhone ||
-                    newCase.SuppliedName != oldCases.get(newCase.Id).SuppliedName) {
-
-                if (RestUtilities.isRestApiContext() == false) {
-                    newCase.Last_Change_Org_Id__c = MY_SOURCE_ORG_NAME;
-                }
+        } else {
+            if (!caseExternalIdsToUpdate.isEmpty()) {
+                UCFCaseCalloutService.sendUpsertCallout(caseExternalIdsToUpdate);
             }
         }
     }

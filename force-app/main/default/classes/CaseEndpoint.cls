@@ -2,7 +2,7 @@
 global with sharing class CaseEndpoint {
     private static final String PARAM_EXTERNAL_ID = 'external_id';
     private static final String EXCEPTION_MESSAGE_BAD_PARAMETERS = 'None or Bad External Id was passed into the parameter.';
-    private static final String EXCEPTION_MESSAGE_WRONG_PARAMETER_PROVIDED = 'Wrong parameter provided.';
+    private static final String EXCEPTION_MESSAGE_WRONG_PARAMETER_PROVIDED = 'Wrong parameter was provided.';
     private static final String EXCEPTION_MESSAGE_CASE_NOT_FOUND = 'Case with given id was not found.';
 
     @HttpPost
@@ -20,9 +20,9 @@ global with sharing class CaseEndpoint {
             newCase.Subject = receivedCase.Subject;
             newCase.Description = receivedCase.Description;
             newCase.Comments = receivedCase.Comments;
-            newCase.SuppliedEmail = receivedCase.SuppliedEmail;
-            newCase.SuppliedPhone = receivedCase.SuppliedPhone;
-            newCase.SuppliedName = receivedCase.SuppliedName;
+            newCase.SuppliedEmail = receivedCase.supplied_email;
+            newCase.SuppliedPhone = receivedCase.supplied_phone;
+            newCase.SuppliedName = receivedCase.supplied_name;
             newCase.External_Id__c = receivedCase.external_id;
             newCase.Last_Change_Org_Id__c = receivedCase.last_change_source_org;
             casesToUpdateList.add(newCase);
@@ -38,11 +38,11 @@ global with sharing class CaseEndpoint {
             List<Case> caseToDeleteByExtId = [SELECT Id FROM Case WHERE External_Id__c In :parameterValues];
             if (caseToDeleteByExtId.isEmpty()) {
                 throw new ResourceNotFoundException(EXCEPTION_MESSAGE_CASE_NOT_FOUND);
-            }
-            if (String.isBlank(requestParam)) {
+            } else if (String.isBlank(requestParam)) {
                 throw new WrongParametersProvidedException(EXCEPTION_MESSAGE_WRONG_PARAMETER_PROVIDED);
+            } else {
+                delete caseToDeleteByExtId;
             }
-            delete caseToDeleteByExtId;
 
         } CATCH (Exception e) {
             RestContext.response.responseBody = Blob.valueOf(e.getMessage());
