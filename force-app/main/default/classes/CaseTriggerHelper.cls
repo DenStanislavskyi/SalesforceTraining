@@ -1,7 +1,7 @@
 public with sharing class CaseTriggerHelper {
 
-    private static final String MY_SOURCE_ORG_NAME = 'DENYS';
-    
+    @TestVisible private static final String MY_SOURCE_ORG_NAME = 'DENYS';
+
     public void changeQueueOwnerByLanguage(Case newCase) {
         if (newCase.OwnerId.getSobjectType() != User.getSObjectType()) {
             Id queueLanguageId = CaseRoutingService.getInstance().getQueueForCase(newCase);
@@ -28,6 +28,15 @@ public with sharing class CaseTriggerHelper {
             }
         }
     }
+    public void setSourceOrgFieldUponInsert(Case newCase) {
+
+        newCase.Last_Change_Org_Id__c = MY_SOURCE_ORG_NAME;
+    }
+
+    public void generateExternalIdForNewCase(Case newCase) {
+
+        newCase.External_Id__c = GuidGenerator.generate();
+    }
 
     public void setDateTimeOfLastStatusChange(Case newCase, Case oldCase) {
         if (oldCase.Status != newCase.Status) {
@@ -40,9 +49,15 @@ public with sharing class CaseTriggerHelper {
     }
 
     public void updateLastChangeSourceOrgField(Case newCase, Case oldCase) {
+        if (isIntegrationSensitiveDataChanged(newCase, oldCase)) {
+            if (RestUtilities.isRestApiContext() == false) {
+                newCase.Last_Change_Org_Id__c = MY_SOURCE_ORG_NAME;
+            }
+        }
+    }
 
-        System.debug(newCase.Last_Change_Org_Id__c);
-        if (newCase.Preferred_Language__c != oldCase.Preferred_Language__c ||
+    public Boolean isIntegrationSensitiveDataChanged(Case newCase, Case oldCase) {
+        return newCase.Preferred_Language__c != oldCase.Preferred_Language__c ||
                 newCase.RecordType.DeveloperName != oldCase.RecordType.DeveloperName ||
                 newCase.Priority != oldCase.Priority ||
                 newCase.Origin != oldCase.Origin ||
@@ -51,11 +66,6 @@ public with sharing class CaseTriggerHelper {
                 newCase.Comments != oldCase.Comments ||
                 newCase.SuppliedEmail != oldCase.SuppliedEmail ||
                 newCase.SuppliedPhone != oldCase.SuppliedPhone ||
-                newCase.SuppliedName != oldCase.SuppliedName) {
-
-            if (RestUtilities.isRestApiContext() == false) {
-                newCase.Last_Change_Org_Id__c = MY_SOURCE_ORG_NAME;
-            }
-        }
+                newCase.SuppliedName != oldCase.SuppliedName;
     }
 }

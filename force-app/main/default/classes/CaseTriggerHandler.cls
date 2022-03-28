@@ -1,14 +1,21 @@
 public with sharing class CaseTriggerHandler implements ITrigger {
 
     private Set<String> caseExternalIdsToDelete = new Set<String>();
-    private Set<String> caseExternalIdsToUpdate = new Set<String>();
+    private Set<String> caseExternalIdsToUpsert = new Set<String>();
+    private static boolean isUpsertRequestSent = false;
+    private static boolean isDeleteRequestSent = false;
+    private static final String DESTINATION_ORG_NAME = 'FILIP';
+    CaseTriggerHelper caseHelper;
 
-    CaseTriggerHelper caseHelper = new CaseTriggerHelper();
+    public CaseTriggerHandler() {
+        caseExternalIdsToUpsert = new Set<String>();
+        caseExternalIdsToDelete = new Set<String>();
+        caseHelper = new CaseTriggerHelper();
+    }
+
     public void run() {
-        bulkBefore();
-        bulkAfter();
-
         if (Trigger.isBefore) {
+            bulkBefore();
             if (Trigger.isInsert) {
                 for (Case newCase : (List<Case>) Trigger.new) {
                     beforeInsert(newCase);
@@ -17,12 +24,11 @@ public with sharing class CaseTriggerHandler implements ITrigger {
 
             else if (Trigger.isUpdate) {
                 for (Case newCase : (List<Case>) Trigger.new) {
-                    for (Case oldCase : (List<Case>) Trigger.old) {
-                        beforeUpdate(newCase, oldCase);
-                    }
+                    beforeUpdate(newCase, (Case) Trigger.oldMap.get(newCase.Id));
                 }
             }
         } else if (Trigger.isAfter) {
+            bulkAfter();
             if (Trigger.isInsert) {
                 for (Case newCase : (List<Case>) Trigger.new) {
                     afterInsert(newCase);
@@ -31,9 +37,7 @@ public with sharing class CaseTriggerHandler implements ITrigger {
 
             else if (Trigger.isUpdate) {
                 for (Case newCase : (List<Case>) Trigger.new) {
-                    for (Case oldCase : (List<Case>) Trigger.old) {
-                        afterUpdate(newCase, oldCase);
-                    }
+                    afterUpdate(newCase, (Case) Trigger.oldMap.get(newCase.Id));
                 }
             } else if (Trigger.isDelete) {
                 for (Case oldCase : (List<Case>) Trigger.old) {
@@ -44,8 +48,16 @@ public with sharing class CaseTriggerHandler implements ITrigger {
         andFinally();
     }
 
+    public void bulkBefore() {
+
+    }
+
     public void beforeInsert(Case newCase) {
         caseHelper.setDateTimeOfLastStatusChange(newCase);
+        if (newCase.External_Id__c == null) {
+            caseHelper.setSourceOrgFieldUponInsert(newCase);
+            caseHelper.generateExternalIdForNewCase(newCase);
+        }
     }
 
     private void beforeUpdate(Case newCase, Case oldCase) {
@@ -55,52 +67,42 @@ public with sharing class CaseTriggerHandler implements ITrigger {
         caseHelper.changeQueueOwnerByLanguage(newCase, oldCase);
     }
 
+    public void bulkAfter() {
+
+    }
+
     public void afterInsert(Case newCase) {
         if (newCase.External_Id__c != null) {
-            caseExternalIdsToUpdate.add(newCase.External_Id__c);
+            if (newCase.Last_Change_Org_Id__c != DESTINATION_ORG_NAME) {
+                caseExternalIdsToUpsert.add(newCase.External_Id__c);
+            }
         }
     }
 
     public void afterUpdate(Case newCase, Case oldCase) {
         if (newCase.External_Id__c != null) {
-            caseExternalIdsToUpdate.add(newCase.External_Id__c);
+            if (newCase.Last_Change_Org_Id__c != DESTINATION_ORG_NAME && caseHelper.isIntegrationSensitiveDataChanged(newCase, oldCase)) {
+                caseExternalIdsToUpsert.add(newCase.External_Id__c);
+            }
         }
     }
 
     public void afterDelete(Case oldCase) {
-        if (oldCase.External_Id__c != null) {
+        if (oldCase.External_Id__c != null && oldCase.Last_Change_Org_Id__c != DESTINATION_ORG_NAME) {
             caseExternalIdsToDelete.add(oldCase.External_Id__c);
-        }
-    }
-
-    public void bulkBefore() {
-        if (Trigger.isUpdate) {
-
-        }
-
-        else if (Trigger.isInsert) {
-
-        }
-    }
-
-    public void bulkAfter() {
-        if (Trigger.isUpdate) {
-
-        }
-
-        else if (Trigger.isInsert) {
-
         }
     }
 
     public void andFinally() {
         if (Trigger.isDelete) {
-            if (!caseExternalIdsToDelete.isEmpty()) {
-                UCFCaseCalloutService.sendDeleteCallout(caseExternalIdsToDelete);
+            if (!caseExternalIdsToDelete.isEmpty() && isDeleteRequestSent == false) {
+                isDeleteRequestSent = true;
+                System.enqueueJob(new DeleteCasesCalloutQueueable(caseExternalIdsToDelete));
             }
         } else {
-            if (!caseExternalIdsToUpdate.isEmpty()) {
-                UCFCaseCalloutService.sendUpsertCallout(caseExternalIdsToUpdate);
+            if (!caseExternalIdsToUpsert.isEmpty() && isUpsertRequestSent == false) {
+                isUpsertRequestSent = true;
+                System.enqueueJob(new UpsertCasesCalloutQueueable(caseExternalIdsToUpsert));
             }
         }
     }
