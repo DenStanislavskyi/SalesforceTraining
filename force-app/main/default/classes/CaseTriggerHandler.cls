@@ -54,10 +54,10 @@ public with sharing class CaseTriggerHandler implements ITrigger {
 
     public void beforeInsert(Case newCase) {
         caseHelper.setDateTimeOfLastStatusChange(newCase);
-        if (newCase.External_Id__c == null) {
-            caseHelper.setSourceOrgFieldUponInsert(newCase);
+        if (newCase.External_Id__c == null)
             caseHelper.generateExternalIdForNewCase(newCase);
-        }
+        if (newCase.Last_Change_Org_Id__c == null)
+            caseHelper.setSourceOrgFieldUponInsert(newCase);
     }
 
     private void beforeUpdate(Case newCase, Case oldCase) {

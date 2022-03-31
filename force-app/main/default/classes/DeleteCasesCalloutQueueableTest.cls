@@ -1,31 +1,29 @@
 @IsTest
 private class DeleteCasesCalloutQueueableTest {
-    @testSetup
-    static void setup() {
+
+    @IsTest
+    static void shouldAssignJobId() {
         List<Case> cases = new List<Case>();
 
         for (Integer i = 0; i < 100; i++) {
             cases.add(new Case(
                     Status = 'Test New' + i,
-                    Origin = 'Phone'
-                    //External_Id__c = 'test' + i,
-                    //Preferred_Language__c = 'English'
+                    Origin = 'Phone',
+                    External_Id__c = 'test' + i
             ));
         }
         insert cases;
-    }
 
-    @IsTest static void testDeleteQueueable() {
 
-        List<Case> cases = [select Status, Origin from Case where Status like 'Test New%'];
-
-        DeleteCasesCalloutQueueable deleteCases = new DeleteCasesCalloutQueueable(cases);
-
+        Case testCase = [SELECT Id, External_Id__c FROM Case limit 1];
+        Set<String> externalIds = new Set<String>{
+                testCase.External_Id__c
+        };
         Test.startTest();
-        System.enqueueJob(deleteCases);
+        Test.setMock(HttpCalloutMock.class, new HTTPMockFactory());
+        Id jobId = System.enqueueJob(new DeleteCasesCalloutQueueable(externalIds));
         Test.stopTest();
-
-        System.assertEquals(100, cases.size());
+        System.assertNotEquals(null, jobId);
     }
 }
 

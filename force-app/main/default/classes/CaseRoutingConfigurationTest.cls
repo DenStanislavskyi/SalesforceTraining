@@ -1,6 +1,6 @@
 @IsTest
 private class CaseRoutingConfigurationTest {
-   
+
     @IsTest static void CaseRoutingConfigurationTest() {
         String queue = 'Payment_Department';
         Routing_Configuration__mdt expectedRouting = [
@@ -12,8 +12,12 @@ private class CaseRoutingConfigurationTest {
         ];
 
         Routing_Configuration__mdt routing = CaseRoutingConfiguration.getInstance().getRoutingData(queue);
+        System.assertEquals(expectedRouting.Id, routing.Id);
+    }
 
-        System.assertEquals(expectedRouting, routing); //id w expected
+    @IsTest static void shouldReturnNullGivenNotExitingQueueDispatcher() {
+        Routing_Configuration__mdt routing = CaseRoutingConfiguration.getInstance().getRoutingData('Ukrainian_Payment_Department');
+        System.assertEquals(null, routing);
     }
 }
 

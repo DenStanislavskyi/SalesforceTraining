@@ -105,14 +105,13 @@
 
             <label for="recordType">Issue Selection</label><select id="recordType" name="recordType" required="true">
                 <option value="0127Q000000xb1k">Invoice Request</option>
-                <option value="0127Q000000xbea">Delivery Complaint</option>
-                <option value="0127Q000000xbeQ">Delivery Information</option>
                 <option value="0127Q000000xb1p">Invoice Correction</option>
-
+                <option value="0127Q000000xbeQ">Support Question</option>
+                <option value="0127Q000000xbeL">Change Request</option>
+                <option value="0127Q000000xbea">Delivery Complaint</option>
                 <option value="0127Q000000xbef">Missing/Damaged Goods</option>
+                <option value="0127Q000000xbek">Complaint Other</option>
                 <option value="0127Q000000xbeV">Other</option>
-                <option value="0127Q000000xbeL">Pickup Request</option>
-                <option value="0127Q000000xbek">Wrong Location</option>
             </select><br/>
 
             Preferred Language:<select id="00N7Q000004wsW5" name="00N7Q000004wsW5" title="Preferred Language"

@@ -13,7 +13,24 @@ public with sharing class UCFCaseCalloutService {
             CaseUtils.getRecordTypeIdByDevName(CaseUtils.RT_OTHER) => 'Support_Other'
     };
 
-    public static void sendUpsertCallout(List<Case> casesData) {
+    public static HttpResponse sendDeleteCallout(Set<String> casesExternalIds) {
+        List<Case> casesList = new List<Case>();
+        for (String externalId : casesExternalIds) {
+            casesList.add(new Case(External_Id__c = externalId));
+        }
+        return sendDeleteCallout(casesList);
+    }
+
+    public static HttpResponse sendUpsertCallout(Set<String> casesExternalIds) {
+        List<Case> casesListToUpdate = new List<Case> ([
+                SELECT External_Id__c, Preferred_language__c, RecordType.DeveloperName, Priority, Origin, Subject, Description, Comments, SuppliedEmail, SuppliedPhone, SuppliedName, Last_Change_Org_Id__c
+                FROM Case
+                WHERE External_Id__c IN :casesExternalIds
+        ]);
+        return sendUpsertCallout(casesListToUpdate);
+    }
+
+    public static HttpResponse sendUpsertCallout(List<Case> casesData) {
         List<CaseWrapper> wrappedCasesToSend = new List<CaseWrapper>();
         HttpRequest request = new HttpRequest();
         Http http = new Http();
@@ -21,27 +38,29 @@ public with sharing class UCFCaseCalloutService {
         request.setMethod('POST');
         request.setHeader('Content-Type', 'application/json;charset=UTF-8');
         request.setBody(wrapCasesAndBuildJson(casesData));
-        HTTPResponse response = http.send(request);
-        System.debug(response);
+        System.debug(request.getBody());
+        return http.send(request);
     }
 
-    public static void sendDeleteCallout(List<Case> casesReceivedToDelete) {
+    public static HttpResponse sendDeleteCallout(List<Case> casesReceivedToDelete) {
         HttpRequest request = new HttpRequest();
         Http http = new Http();
         request.setMethod('DELETE');
         request.setHeader('Content-Type', 'application/x-www-form-urlencoded');
         request.setEndpoint(FILIPS_ORG_ENDPOINT + buildEndpointParameterForDelete(casesReceivedToDelete));
-        HttpResponse response = http.send(request);
-        System.debug(response);
-        System.debug(response.getBody());
+        return http.send(request);
     }
 
     public static String wrapCasesAndBuildJson(List<Case> casesData) {
         List<CaseWrapper> wrappedCasesToSend = new List<CaseWrapper>();
         for (Case processedCase : casesData) {
-            CaseWrapper caseWrapper = new CaseWrapper(processedCase);
-            caseWrapper.record_type = IdToExternalRecordTypeMap.get(processedCase.RecordType.Id);
-            wrappedCasesToSend.add(caseWrapper);
+            if (processedCase.Last_Change_Org_Id__c == 'FILIP') {
+                return null;
+            } else {
+                CaseWrapper caseWrapper = new CaseWrapper(processedCase);
+                caseWrapper.record_type = IdToExternalRecordTypeMap.get(processedCase.RecordType.Id);
+                wrappedCasesToSend.add(caseWrapper);
+            }
         }
         String jsonSerialized = JSON.serialize(wrappedCasesToSend);
         return jsonSerialized;
@@ -53,11 +72,11 @@ public with sharing class UCFCaseCalloutService {
             externalIdList.add(processedCase.External_Id__c);
         }
         String parameterBuilt = new CaseParameterBuilder().addParam(PARAM_EXTERNAL_ID, String.join(externalIdList, ',')).build();
-        if (String.isNotBlank(parameterBuilt)) {
-            System.debug(parameterBuilt);
-            return parameterBuilt;
-        }
-        return null;
+        //if (String.isNotBlank(parameterBuilt)) {
+        System.debug(parameterBuilt);
+        return parameterBuilt;
+        //}
+        //return null;
     }
 }
 

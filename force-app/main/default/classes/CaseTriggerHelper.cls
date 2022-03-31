@@ -1,13 +1,19 @@
 public with sharing class CaseTriggerHelper {
 
     @TestVisible private static final String MY_SOURCE_ORG_NAME = 'DENYS';
+    @TestVisible private static final String SOURCE_ORG_NAME_PAULINA = 'PAULINA';
+    @TestVisible private static final String SOURCE_ORG_NAME_FILIP = 'FILIP';
+    @TestVisible static final String GROUP_TYPE = 'Queue';
+    @TestVisible static final String QUEUE_DEVELOPER_NAME_MAIN_QUEUE = 'Payment_Department';
+    @TestVisible static final String QUEUE_DEVELOPER_NAME_ENGLISH = 'Payment_Department_English';
+    @TestVisible static final String QUEUE_DEVELOPER_NAME_GERMAN = 'Payment_Department_German';
 
     public void changeQueueOwnerByLanguage(Case newCase) {
         if (newCase.OwnerId.getSobjectType() != User.getSObjectType()) {
             Id queueLanguageId = CaseRoutingService.getInstance().getQueueForCase(newCase);
             if (queueLanguageId != null) {
                 newCase.OwnerId = queueLanguageId;
-                if (newCase.External_Id__c == null) {
+                if (String.isBlank(newCase.External_Id__c)) {
                     newCase.External_Id__c = GuidGenerator.generate();
                 }
                 if (String.isBlank(newCase.Last_Change_Org_Id__c)) {

@@ -1,9 +1,9 @@
 @RestResource(urlMapping='/cases/*')
 global with sharing class CaseEndpoint {
-    private static final String PARAM_EXTERNAL_ID = 'external_id';
-    private static final String EXCEPTION_MESSAGE_BAD_PARAMETERS = 'None or Bad External Id was passed into the parameter.';
-    private static final String EXCEPTION_MESSAGE_WRONG_PARAMETER_PROVIDED = 'Wrong parameter was provided.';
-    private static final String EXCEPTION_MESSAGE_CASE_NOT_FOUND = 'Case with given id was not found.';
+    @TestVisible private static final String PARAM_EXTERNAL_ID = 'external_id';
+    @TestVisible private static final String EXCEPTION_MESSAGE_BAD_PARAMETERS = 'None or Bad External Id was passed into the parameter.';
+    @TestVisible private static final String EXCEPTION_MESSAGE_WRONG_PARAMETER_PROVIDED = 'Wrong parameter was provided.';
+    @TestVisible private static final String EXCEPTION_MESSAGE_CASE_NOT_FOUND = 'Case with given id was not found.';
 
     @HttpPost
     global static void upsertCases() {
@@ -33,9 +33,11 @@ global with sharing class CaseEndpoint {
     @HttpDelete
     global static void deleteCase() {
         String requestParam = RestContext.request.params.get(PARAM_EXTERNAL_ID);
+
         List<String> parameterValues = requestParam.split(',');
+        List<Case> caseToDeleteByExtId = [SELECT Id FROM Case WHERE External_Id__c In :parameterValues];
+
         TRY {
-            List<Case> caseToDeleteByExtId = [SELECT Id FROM Case WHERE External_Id__c In :parameterValues];
             if (caseToDeleteByExtId.isEmpty()) {
                 throw new ResourceNotFoundException(EXCEPTION_MESSAGE_CASE_NOT_FOUND);
             } else if (String.isBlank(requestParam)) {
