@@ -1,6 +1,6 @@
-.THIS.slds-p-around--medium {
+.THIS .cuf-content {
     padding: 0rem !important;
     }
-.THIS.ftr {
-    padding: 0rem !important;
-    }
+.THIS .displayNone{
+    display: none;
+}
